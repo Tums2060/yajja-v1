@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'expo-router';
 import {
   Image,
@@ -24,16 +24,10 @@ const COLORS = {
   link: '#6B4700',
 };
 
-export default function SignUp() {
+export default function Login() {
   const { width } = useWindowDimensions();
   const cardWidth = Math.min(width - 48, 420);
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
-  const mismatch = useMemo(() => {
-    if (!confirmPassword) return false;
-    return password !== confirmPassword;
-  }, [password, confirmPassword]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -56,17 +50,8 @@ export default function SignUp() {
             resizeMode="contain"
           />
 
-          <Text style={styles.title}>Join Yajja</Text>
-          <Text style={styles.subtitle}>Start your culinary journey today.</Text>
-
-          <View style={styles.fieldGroup}>
-            <Text style={styles.label}>Full Name</Text>
-            <TextInput
-              placeholder="Enter your name"
-              placeholderTextColor={COLORS.placeholder}
-              style={styles.input}
-            />
-          </View>
+          <Text style={styles.title}>Welcome Back</Text>
+          <Text style={styles.subtitle}>Log in to continue.</Text>
 
           <View style={styles.fieldGroup}>
             <Text style={styles.label}>Email</Text>
@@ -80,19 +65,9 @@ export default function SignUp() {
           </View>
 
           <View style={styles.fieldGroup}>
-            <Text style={styles.label}>Phone Number</Text>
-            <TextInput
-              placeholder="Enter your phone number"
-              placeholderTextColor={COLORS.placeholder}
-              keyboardType="phone-pad"
-              style={styles.input}
-            />
-          </View>
-
-          <View style={styles.fieldGroup}>
             <Text style={styles.label}>Password</Text>
             <TextInput
-              placeholder="Create a password"
+              placeholder="Enter your password"
               placeholderTextColor={COLORS.placeholder}
               secureTextEntry
               style={styles.input}
@@ -101,29 +76,14 @@ export default function SignUp() {
             />
           </View>
 
-          <View style={styles.fieldGroup}>
-            <Text style={styles.label}>Confirm Password</Text>
-            <TextInput
-              placeholder="Re-enter your password"
-              placeholderTextColor={COLORS.placeholder}
-              secureTextEntry
-              style={[styles.input, mismatch && styles.inputError]}
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-            />
-            {mismatch ? (
-              <Text style={styles.errorText}>Passwords do not match.</Text>
-            ) : null}
-          </View>
-
           <View style={styles.primaryButton}>
-            <Text style={styles.primaryButtonText}>CREATE ACCOUNT</Text>
+            <Text style={styles.primaryButtonText}>LOG IN</Text>
           </View>
 
           <Text style={styles.footerText}>
-            Already have an account?{' '}
-            <Link href="/login" asChild>
-              <Text style={styles.footerLink}>Log in</Text>
+            Do not have an account?{' '}
+            <Link href="/signup" asChild>
+              <Text style={styles.footerLink}>Sign up</Text>
             </Link>
           </Text>
 
@@ -209,14 +169,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.textPrimary,
     backgroundColor: '#FFFDFB',
-  },
-  inputError: {
-    borderColor: '#C4634D',
-  },
-  errorText: {
-    color: '#C4634D',
-    fontSize: 11,
-    marginTop: 2,
   },
   primaryButton: {
     width: '100%',

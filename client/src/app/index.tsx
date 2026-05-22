@@ -56,9 +56,11 @@ export default function Home() {
               <Text style={styles.primaryButtonText}>SIGN UP</Text>
             </Pressable>
           </Link>
-          <Pressable style={styles.secondaryButton}>
-            <Text style={styles.secondaryButtonText}>LOG IN</Text>
-          </Pressable>
+          <Link href="/login" asChild>
+            <Pressable style={styles.secondaryButton}>
+              <Text style={styles.secondaryButtonText}>LOG IN</Text>
+            </Pressable>
+          </Link>
           <Pressable style={styles.guestButton}>
             <Text style={styles.guestButtonText}>CONTINUE AS GUEST</Text>
           </Pressable>
