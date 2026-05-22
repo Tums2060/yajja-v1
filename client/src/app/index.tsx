@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'expo-router';
 import {
   Image,
   Pressable,
@@ -28,6 +29,15 @@ export default function Home() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <View style={styles.backgroundLayer} pointerEvents="none">
+        <Image
+          source={require('@/assets/images/food-background.jpg')}
+          style={styles.backgroundImage}
+          resizeMode="cover"
+        />
+        <View style={styles.backgroundOverlay} />
+      </View>
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
@@ -41,9 +51,11 @@ export default function Home() {
         </View>
 
         <View style={[styles.actions, { width: cardWidth }]}>
-          <Pressable style={styles.primaryButton}>
-            <Text style={styles.primaryButtonText}>SIGN UP</Text>
-          </Pressable>
+          <Link href="/signup" asChild>
+            <Pressable style={styles.primaryButton}>
+              <Text style={styles.primaryButtonText}>SIGN UP</Text>
+            </Pressable>
+          </Link>
           <Pressable style={styles.secondaryButton}>
             <Text style={styles.secondaryButtonText}>LOG IN</Text>
           </Pressable>
@@ -60,6 +72,19 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  backgroundLayer: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  backgroundImage: {
+    width: '100%',
+    height: '100%',
+    opacity: 0.22,
+  },
+  backgroundOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: COLORS.background,
+    opacity: 0.35,
   },
   scrollContent: {
     flexGrow: 1,
