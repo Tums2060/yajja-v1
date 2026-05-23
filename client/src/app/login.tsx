@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import {
   Image,
+  Platform,
+  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -10,6 +12,9 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
+
+import { postJson } from '@/utils/api';
 
 const COLORS = {
   background: '#FBF6EF',
@@ -24,10 +29,63 @@ const COLORS = {
   link: '#6B4700',
 };
 
+async function storeAuthToken(token: string) {
+  if (Platform.OS === 'web') {
+    try {
+      window.localStorage.setItem('auth_token', token);
+    } catch {
+      // Ignore storage failures in private mode or restricted contexts.
+    }
+    return;
+  }
+
+  const setItem = SecureStore.setItemAsync;
+  if (typeof setItem === 'function') {
+    await setItem('auth_token', token);
+  }
+}
+
 export default function Login() {
   const { width } = useWindowDimensions();
   const cardWidth = Math.min(width - 48, 420);
+  const router = useRouter();
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleSubmit() {
+    if (isSubmitting) return;
+    if (!email || !password) {
+      setErrorMessage('Email and password are required.');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setErrorMessage('');
+
+      const response = await postJson<{ token?: string; message?: string }>(
+        '/auth/login',
+        {
+          email,
+          password,
+        }
+      );
+
+      if (!response.ok) {
+        setErrorMessage(response.error || 'Login failed.');
+        return;
+      }
+
+      if (response.data?.token) {
+        await storeAuthToken(response.data.token);
+      }
+      router.replace('/dashboard');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -61,6 +119,8 @@ export default function Login() {
               keyboardType="email-address"
               autoCapitalize="none"
               style={styles.input}
+              value={email}
+              onChangeText={setEmail}
             />
           </View>
 
@@ -76,9 +136,16 @@ export default function Login() {
             />
           </View>
 
-          <View style={styles.primaryButton}>
-            <Text style={styles.primaryButtonText}>LOG IN</Text>
-          </View>
+          {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+
+          <Pressable
+            style={[styles.primaryButton, isSubmitting && styles.primaryButtonDisabled]}
+            onPress={handleSubmit}
+            disabled={isSubmitting}>
+            <Text style={styles.primaryButtonText}>
+              {isSubmitting ? 'LOGGING IN...' : 'LOG IN'}
+            </Text>
+          </Pressable>
 
           <Text style={styles.footerText}>
             Do not have an account?{' '}
@@ -170,6 +237,11 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     backgroundColor: '#FFFDFB',
   },
+  errorText: {
+    color: '#C4634D',
+    fontSize: 11,
+    marginTop: 2,
+  },
   primaryButton: {
     width: '100%',
     paddingVertical: 14,
@@ -177,6 +249,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     alignItems: 'center',
     marginTop: 14,
+  },
+  primaryButtonDisabled: {
+    opacity: 0.6,
   },
   primaryButtonText: {
     color: COLORS.primaryText,
