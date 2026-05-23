@@ -10,7 +10,8 @@ type ApiResponse<T> = {
 
 function getApiBaseUrl() {
   if (Platform.OS === 'web') {
-    return 'http://localhost:5000';
+    const host = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+    return `http://${host}:5000`;
   }
 
   const hostUri =
