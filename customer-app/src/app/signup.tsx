@@ -92,7 +92,7 @@ export default function SignUp() {
       if (response.data?.token) {
         await storeAuthToken(response.data.token);
       }
-      router.replace('/dashboard');
+      router.replace('/(tabs)');
     } finally {
       setIsSubmitting(false);
     }
