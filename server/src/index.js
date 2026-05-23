@@ -39,13 +39,35 @@ function sanitizeUser(user) {
     name: user.name,
     email: user.email,
     phone: user.phone,
+    role: user.role ? user.role.toLowerCase() : undefined,
     createdAt: user.createdAt,
   };
 }
 
+const ROLE_MAP = {
+  customer: "CUSTOMER",
+  rider: "RIDER",
+  vendor: "VENDOR",
+  admin: "ADMIN",
+};
+
+function normalizeRole(input, fallback) {
+  if (input === undefined || input === null || input === "") {
+    return fallback ?? null;
+  }
+
+  const normalized = String(input).toLowerCase();
+  return ROLE_MAP[normalized] || null;
+}
+
 app.post("/auth/signup", async (req, res) => {
   try {
-    const { name, email, phone, password } = req.body;
+    const { name, email, phone, password, role } = req.body;
+    const normalizedRole = normalizeRole(role, "CUSTOMER");
+
+    if (!normalizedRole) {
+      return res.status(400).json({ message: "Invalid role." });
+    }
 
     if (!email || !phone || !password) {
       return res.status(400).json({ message: "Email, phone, and password are required." });
@@ -68,10 +90,15 @@ app.post("/auth/signup", async (req, res) => {
         email,
         phone,
         passwordHash,
+        role: normalizedRole,
       },
     });
 
-    const token = jwt.sign({ userId: user.id }, getJwtSecret(), { expiresIn: "7d" });
+    const token = jwt.sign(
+      { userId: user.id, role: user.role.toLowerCase() },
+      getJwtSecret(),
+      { expiresIn: "7d" }
+    );
 
     return res.status(201).json({
       token,
@@ -85,7 +112,12 @@ app.post("/auth/signup", async (req, res) => {
 
 app.post("/auth/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
+    const normalizedRole = normalizeRole(role, null);
+
+    if (role && !normalizedRole) {
+      return res.status(400).json({ message: "Invalid role." });
+    }
 
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password are required." });
@@ -96,12 +128,20 @@ app.post("/auth/login", async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials." });
     }
 
+    if (normalizedRole && user.role !== normalizedRole) {
+      return res.status(401).json({ message: "Invalid credentials." });
+    }
+
     const matches = await bcrypt.compare(password, user.passwordHash);
     if (!matches) {
       return res.status(401).json({ message: "Invalid credentials." });
     }
 
-    const token = jwt.sign({ userId: user.id }, getJwtSecret(), { expiresIn: "7d" });
+    const token = jwt.sign(
+      { userId: user.id, role: user.role.toLowerCase() },
+      getJwtSecret(),
+      { expiresIn: "7d" }
+    );
     return res.status(200).json({
       token,
       user: sanitizeUser(user),

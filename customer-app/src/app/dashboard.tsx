@@ -5,7 +5,7 @@ export default function Dashboard() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.text}>This is the dashboard.</Text>
+        <Text style={styles.text}>This is the customer dashboard.</Text>
       </View>
     </SafeAreaView>
   );

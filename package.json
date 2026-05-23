@@ -1,6 +1,19 @@
 {
+  "name": "yajja-v1",
+  "private": true,
+  "scripts": {
+    "start": "npm run start:apps",
+    "start:apps": "concurrently -n customer,rider,vendor,admin -c blue,magenta,green,cyan \"node -e \\\"console.log('Customer App running at: http://localhost:8081')\\\" && npm --prefix customer-app run start -- --port 8081\" \"node -e \\\"console.log('Rider App running at: http://localhost:8082')\\\" && npm --prefix rider-app run start -- --port 8082\" \"node -e \\\"console.log('Vendor App running at: http://localhost:8083')\\\" && npm --prefix vendor-app run start -- --port 8083\" \"node -e \\\"console.log('Admin App running at: http://localhost:8084')\\\" && npm --prefix admin-app run start -- --port 8084\"",
+    "start:customer": "npm --prefix customer-app run start",
+    "start:rider": "npm --prefix rider-app run start",
+    "start:vendor": "npm --prefix vendor-app run start",
+    "start:admin": "npm --prefix admin-app run start"
+  },
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "jsonwebtoken": "^9.0.3"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }

@@ -70,6 +70,7 @@ export default function Login() {
         {
           email,
           password,
+          role: 'customer',
         }
       );
 
@@ -108,7 +109,7 @@ export default function Login() {
             resizeMode="contain"
           />
 
-          <Text style={styles.title}>Welcome Back</Text>
+          <Text style={styles.title}>Login as Customer</Text>
           <Text style={styles.subtitle}>Log in to continue.</Text>
 
           <View style={styles.fieldGroup}>

@@ -80,6 +80,7 @@ export default function SignUp() {
           email,
           phone,
           password,
+          role: 'customer',
         }
       );
 
@@ -118,7 +119,7 @@ export default function SignUp() {
             resizeMode="contain"
           />
 
-          <Text style={styles.title}>Join Yajja</Text>
+          <Text style={styles.title}>Sign Up as Customer</Text>
           <Text style={styles.subtitle}>Start your culinary journey today.</Text>
 
           <View style={styles.fieldGroup}>
